@@ -36,7 +36,7 @@ func listAction(todos todo.Todos, _ string) func(c *cli.Context) error {
 				continue
 			}
 
-			todo.PrintTodoLine(i)
+			fmt.Println(todo.TodoLine(i))
 		}
 
 		return nil

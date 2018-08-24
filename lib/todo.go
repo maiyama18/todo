@@ -9,12 +9,13 @@ type Todo struct {
 
 type Todos []Todo
 
-func (todo Todo) PrintTodoLine(index int) {
+func (todo Todo) TodoLine(index int) string {
+	var check string
 	if todo.Done {
-		fmt.Print("[x] ")
+		check = "[x]"
 	} else {
-		fmt.Print("[ ] ")
+		check = "[ ]"
 	}
 
-	fmt.Printf("#%d %s\n", index, todo.Title)
+	return fmt.Sprintf("%s #%d %s", check, index, todo.Title)
 }
