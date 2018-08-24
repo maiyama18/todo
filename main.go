@@ -54,6 +54,10 @@ func main() {
 					Name: "undone, u",
 					Usage: "show only undone todos",
 				},
+				cli.BoolFlag{
+					Name: "done, d",
+					Usage: "show only done todos",
+				},
 			},
 			Action: listAction(todos, jsonFilename),
 		},

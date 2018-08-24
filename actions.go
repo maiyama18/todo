@@ -21,6 +21,8 @@ func addAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) error
 			return err
 		}
 
+		fmt.Printf("todo: '%s' is added\n", todoTitle)
+
 		return nil
 	}
 }
@@ -29,6 +31,8 @@ func listAction(todos todo.Todos, _ string) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		for i, todo := range todos {
 			if c.Bool("undone") && todo.Done {
+				continue
+			} else if c.Bool("done") && !todo.Done {
 				continue
 			}
 
@@ -56,6 +60,8 @@ func doneAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) erro
 			return err
 		}
 
+		fmt.Printf("todo: '%s' is done\n", todos[index].Title)
+
 		return nil
 	}
 }
@@ -77,6 +83,8 @@ func undoneAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) er
 			return err
 		}
 
+		fmt.Printf("todo: '%s' is now undone\n", todos[index].Title)
+
 		return nil
 	}
 }
@@ -88,11 +96,15 @@ func removeAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) er
 			return errors.New("please enter valid index of todo")
 		}
 
+		todoTitle := todos[index].Title
+
 		todos := append(todos[:index], todos[index+1:]...)
 
 		if err := saveTodosToJsonfile(jsonFilename, todos); err != nil {
 			return err
 		}
+
+		fmt.Printf("todo: '%s' was removed\n", todoTitle)
 
 		return nil
 	}
