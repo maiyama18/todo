@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/cli"
 	"encoding/json"
 	"io/ioutil"
-	todo "github.com/m4iyama/todo/lib"
+	todo "github.com/ymr-39/todo/lib"
 	"path/filepath"
 )
 

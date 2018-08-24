@@ -5,7 +5,7 @@ import (
 	"os"
 	"encoding/json"
 
-	todo "github.com/m4iyama/todo/lib"
+	todo "github.com/ymr-39/todo/lib"
 )
 
 func getHomeDir() (string, error) {

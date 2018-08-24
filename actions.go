@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/urfave/cli"
 	"fmt"
-	todo "github.com/m4iyama/todo/lib"
+	todo "github.com/ymr-39/todo/lib"
 	"strconv"
 	"errors"
 )
