@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"log"
 
@@ -9,9 +8,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	todo "github.com/m4iyama/todo/lib"
-	"os/user"
 	"path/filepath"
-	"strconv"
 )
 
 func main() {
@@ -47,22 +44,7 @@ func main() {
 		{
 			Name:  "add",
 			Usage: "add a task",
-			Action: func(c *cli.Context) error {
-				todoTitle := c.Args().First()
-				if todoTitle == "" {
-					fmt.Println("please enter non-empty todo")
-					os.Exit(1)
-				}
-
-				todos := append(todos, todo.Todo{Title: todoTitle, Done: false})
-				fmt.Println(todos)
-
-				if err := saveTodosToJsonfile(jsonFilename, todos); err != nil {
-					return err
-				}
-
-				return nil
-			},
+			Action: addAction(todos, jsonFilename),
 		},
 		{
 			Name:  "list",
@@ -73,90 +55,22 @@ func main() {
 					Usage: "show only undone todos",
 				},
 			},
-			Action: func(c *cli.Context) error {
-				for i, todo := range todos {
-					if c.Bool("undone") && todo.Done {
-						continue
-					}
-
-					if todo.Done {
-						fmt.Print("[x] ")
-					} else {
-						fmt.Print("[ ] ")
-					}
-
-					fmt.Printf("#%d %s\n", i, todo.Title)
-				}
-
-				return nil
-			},
+			Action: listAction(todos, jsonFilename),
 		},
 		{
 			Name:  "done",
 			Usage: "make a todo done",
-			Action: func(c *cli.Context) error {
-				index, err := strconv.Atoi(c.Args().First())
-				if err != nil || index < 0 || index > len(todos) {
-					fmt.Println("please enter number of todo to done")
-					os.Exit(1)
-				}
-
-				if todos[index].Done {
-					fmt.Printf("todo #%d is already done", index)
-					os.Exit(1)
-				}
-
-				todos[index].Done = true
-
-				if err := saveTodosToJsonfile(jsonFilename, todos); err != nil {
-					return err
-				}
-
-				return nil
-			},
+			Action: doneAction(todos, jsonFilename),
 		},
 		{
 			Name:  "undone",
 			Usage: "make a todo undone",
-			Action: func(c *cli.Context) error {
-				index, err := strconv.Atoi(c.Args().First())
-				if err != nil || index < 0 || index > len(todos) {
-					fmt.Println("please enter number of todo to undone")
-					os.Exit(1)
-				}
-
-				if todos[index].Done {
-					fmt.Printf("todo #%d is still undone", index)
-					os.Exit(1)
-				}
-
-				todos[index].Done = false
-
-				if err := saveTodosToJsonfile(jsonFilename, todos); err != nil {
-					return err
-				}
-
-				return nil
-			},
+			Action: undoneAction(todos, jsonFilename),
 		},
 		{
 			Name:  "remove",
 			Usage: "remove a task",
-			Action: func(c *cli.Context) error {
-				index, err := strconv.Atoi(c.Args().First())
-				if err != nil || index < 0 || index > len(todos) {
-					fmt.Println("please enter number of todo to remove")
-					return err
-				}
-
-				todos := append(todos[:index], todos[index+1:]...)
-
-				if err := saveTodosToJsonfile(jsonFilename, todos); err != nil {
-					return err
-				}
-
-				return nil
-			},
+			Action: removeAction(todos, jsonFilename),
 		},
 	}
 
@@ -165,46 +79,3 @@ func main() {
 	}
 }
 
-func getHomeDir() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-
-	return usr.HomeDir, nil
-}
-
-func createEmptyJsonfile(jsonFilename string) error {
-	f, err := os.Create(jsonFilename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	f.Write([]byte("[]"))
-
-	return nil
-}
-
-func saveTodosToJsonfile(jsonFilename string, todos todo.Todos) error {
-	bytes, err := json.Marshal(todos)
-	if err != nil {
-		return err
-	}
-
-	if err := os.Remove(jsonFilename); err != nil {
-		return err
-	}
-
-	ff, err := os.Create(jsonFilename)
-	if err != nil {
-		return err
-	}
-	defer ff.Close()
-
-	if _, err = ff.Write(bytes); err != nil {
-		return err
-	}
-
-	return nil
-}
