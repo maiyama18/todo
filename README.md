@@ -1,10 +1,10 @@
-## todo - A new cli application
+## todo
+
+This project is written for my practice of Go programming language, and not intended for actual use. 
+But you can still test this app by `go get ymr-39/todo`.
 
 #### USAGE
 `todo [global options] command [command options] [arguments...]`
-
-#### VERSION
-0.0.1
 
 #### COMMANDS
 - `add`        add a task
