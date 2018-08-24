@@ -3,18 +3,16 @@ package main
 import (
 	"github.com/urfave/cli"
 	"fmt"
-	"os"
-
 	todo "github.com/m4iyama/todo/lib"
 	"strconv"
+	"errors"
 )
 
 func addAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		todoTitle := c.Args().First()
 		if todoTitle == "" {
-			fmt.Println("please enter non-empty todo")
-			os.Exit(1)
+			return errors.New("please enter non-empty todo")
 		}
 
 		todos := append(todos, todo.Todo{Title: todoTitle, Done: false})
@@ -51,13 +49,11 @@ func doneAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) erro
 	return func(c *cli.Context) error {
 		index, err := strconv.Atoi(c.Args().First())
 		if err != nil || index < 0 || index > len(todos) {
-			fmt.Println("please enter number of todo to done")
-			os.Exit(1)
+			return errors.New("please enter valid index of todo")
 		}
 
 		if todos[index].Done {
-			fmt.Printf("todo #%d is already done", index)
-			os.Exit(1)
+			return errors.New(fmt.Sprintf("todo #%d is already done", index))
 		}
 
 		todos[index].Done = true
@@ -74,13 +70,11 @@ func undoneAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) er
 	return func(c *cli.Context) error {
 		index, err := strconv.Atoi(c.Args().First())
 		if err != nil || index < 0 || index > len(todos) {
-			fmt.Println("please enter number of todo to undone")
-			os.Exit(1)
+			return errors.New("please enter valid index of todo")
 		}
 
 		if !todos[index].Done {
-			fmt.Printf("todo #%d is still undone", index)
-			os.Exit(1)
+			return errors.New(fmt.Sprintf("todo #%d is still undone", index))
 		}
 
 		todos[index].Done = false
@@ -97,8 +91,7 @@ func removeAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) er
 	return func(c *cli.Context) error {
 		index, err := strconv.Atoi(c.Args().First())
 		if err != nil || index < 0 || index > len(todos) {
-			fmt.Println("please enter number of todo to remove")
-			return err
+			return errors.New("please enter valid index of todo")
 		}
 
 		todos := append(todos[:index], todos[index+1:]...)
