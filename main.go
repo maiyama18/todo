@@ -14,26 +14,26 @@ import (
 func main() {
 	dir, err := getHomeDir()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	jsonFilename := filepath.Join(dir, ".todos.json")
 	if _, err := os.Stat(jsonFilename); os.IsNotExist(err) {
 		if err := createEmptyJsonfile(jsonFilename); err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 	}
 
 	f, err := os.Open(jsonFilename)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer f.Close()
 
 	bytes, err := ioutil.ReadAll(f)
 	var todos todo.Todos
 	if err := json.Unmarshal(bytes, &todos); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	app := cli.NewApp()
