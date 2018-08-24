@@ -32,13 +32,7 @@ func listAction(todos todo.Todos, _ string) func(c *cli.Context) error {
 				continue
 			}
 
-			if todo.Done {
-				fmt.Print("[x] ")
-			} else {
-				fmt.Print("[ ] ")
-			}
-
-			fmt.Printf("#%d %s\n", i, todo.Title)
+			todo.PrintTodoLine(i)
 		}
 
 		return nil
