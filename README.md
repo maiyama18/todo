@@ -1,7 +1,7 @@
 ## todo
 
 This project is written for my practice of Go programming language, and not intended for actual use. 
-But you can still test this app by `go get ymr-39/todo`.
+But you can still test this app by `go get github.com/ymr-39/todo`.
 
 #### USAGE
 `todo [global options] command [command options] [arguments...]`
