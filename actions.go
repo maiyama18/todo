@@ -8,41 +8,6 @@ import (
 	"errors"
 )
 
-func addAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) error {
-	return func(c *cli.Context) error {
-		todoTitle := c.Args().First()
-		if todoTitle == "" {
-			return errors.New("please enter non-empty todo")
-		}
-
-		todos := append(todos, todo.Todo{Title: todoTitle, Done: false})
-
-		if err := saveTodosToJsonfile(jsonFilename, todos); err != nil {
-			return err
-		}
-
-		fmt.Printf("todo: '%s' is added\n", todoTitle)
-
-		return nil
-	}
-}
-
-func listAction(todos todo.Todos, _ string) func(c *cli.Context) error {
-	return func(c *cli.Context) error {
-		for i, todo := range todos {
-			if c.Bool("undone") && todo.Done {
-				continue
-			} else if c.Bool("done") && !todo.Done {
-				continue
-			}
-
-			fmt.Println(todo.TodoLine(i))
-		}
-
-		return nil
-	}
-}
-
 func doneAction(todos todo.Todos, jsonFilename string) func(c *cli.Context) error {
 	return func(c *cli.Context) error {
 		index, err := strconv.Atoi(c.Args().First())

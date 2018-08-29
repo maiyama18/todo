@@ -5,10 +5,11 @@ import (
 	"log"
 
 	"github.com/urfave/cli"
-	"encoding/json"
-	"io/ioutil"
-	todo "github.com/ymr-39/todo/lib"
 	"path/filepath"
+	"github.com/ymr-39/todo/db"
+	"fmt"
+	"strings"
+	"errors"
 )
 
 func main() {
@@ -17,24 +18,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	jsonFilename := filepath.Join(dir, ".todos.json")
-	if _, err := os.Stat(jsonFilename); os.IsNotExist(err) {
-		if err := createEmptyJsonfile(jsonFilename); err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	f, err := os.Open(jsonFilename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	bytes, err := ioutil.ReadAll(f)
-	var todos todo.Todos
-	if err := json.Unmarshal(bytes, &todos); err != nil {
-		log.Fatal(err)
-	}
+	dbPath := filepath.Join(dir, ".todos.db")
+	db.Init(dbPath)
 
 	app := cli.NewApp()
 	app.Name = "todo"
@@ -44,42 +29,65 @@ func main() {
 		{
 			Name:  "add",
 			Usage: "add a task",
-			Action: addAction(todos, jsonFilename),
+			Action: func(c *cli.Context) error {
+				todoTitle := strings.Join(c.Args(), " ")
+				if todoTitle == "" {
+					return errors.New("please enter non-empty todo")
+				}
+
+				return db.CreateTodo(todoTitle)
+			},
 		},
 		{
 			Name:  "list",
 			Usage: "show a todo list",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "undone, u",
+					Name:  "undone, u",
 					Usage: "show only undone todos",
 				},
 				cli.BoolFlag{
-					Name: "done, d",
+					Name:  "done, d",
 					Usage: "show only done todos",
 				},
 			},
-			Action: listAction(todos, jsonFilename),
+			Action: func(c *cli.Context) error {
+				todos, err := db.AllTodos()
+				if err != nil {
+					return err
+				}
+
+				for i, todo := range todos {
+					if c.Bool("undone") && todo.Done {
+						continue
+					} else if c.Bool("done") && !todo.Done {
+						continue
+					}
+
+					fmt.Println(todo.TodoLine(i))
+				}
+
+				return nil
+			},
 		},
-		{
-			Name:  "done",
-			Usage: "make a todo done",
-			Action: doneAction(todos, jsonFilename),
-		},
-		{
-			Name:  "undone",
-			Usage: "make a todo undone",
-			Action: undoneAction(todos, jsonFilename),
-		},
-		{
-			Name:  "remove",
-			Usage: "remove a task",
-			Action: removeAction(todos, jsonFilename),
-		},
+		//{
+		//	Name:  "done",
+		//	Usage: "make a todo done",
+		//	Action: doneAction(todos, dbPath),
+		//},
+		//{
+		//	Name:  "undone",
+		//	Usage: "make a todo undone",
+		//	Action: undoneAction(todos, dbPath),
+		//},
+		//{
+		//	Name:  "remove",
+		//	Usage: "remove a task",
+		//	Action: removeAction(todos, dbPath),
+		//},
 	}
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
-

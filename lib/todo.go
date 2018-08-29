@@ -3,6 +3,7 @@ package todolib
 import "fmt"
 
 type Todo struct {
+	Id uint64
 	Title string
 	Done bool
 }
