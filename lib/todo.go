@@ -20,3 +20,7 @@ func (todo Todo) TodoLine() string {
 
 	return fmt.Sprintf("%s #%d %s", check, todo.Id, todo.Title)
 }
+
+func EmptyTodo() Todo {
+	return Todo{Id: 0, Title: "", Done: false}
+}

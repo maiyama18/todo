@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 	"errors"
+	"strconv"
 )
 
 func main() {
@@ -70,21 +71,58 @@ func main() {
 				return nil
 			},
 		},
-		//{
-		//	Name:  "done",
-		//	Usage: "make a todo done",
-		//	Action: doneAction(todos, dbPath),
-		//},
-		//{
-		//	Name:  "undone",
-		//	Usage: "make a todo undone",
-		//	Action: undoneAction(todos, dbPath),
-		//},
-		//{
-		//	Name:  "remove",
-		//	Usage: "remove a task",
-		//	Action: removeAction(todos, dbPath),
-		//},
+		{
+			Name:  "done",
+			Usage: "make a todo done",
+			Action: func(c *cli.Context) error {
+				idStr := c.Args().First()
+				id, err := strconv.Atoi(idStr)
+				if err != nil {
+					return err
+				}
+
+				err = db.ToggleTodo(uint64(id), true)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			},
+		},
+		{
+			Name:  "undone",
+			Usage: "make a todo undone",
+			Action: func(c *cli.Context) error {
+				idstr := c.Args().First()
+				id, err := strconv.Atoi(idstr)
+				if err != nil {
+					return err
+				}
+
+				err = db.ToggleTodo(uint64(id), false)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			},
+		},
+		{
+			Name:  "remove",
+			Usage: "remove a task",
+			Action: func(c *cli.Context) error {
+				for _, arg := range c.Args() {
+					id, err := strconv.Atoi(arg)
+					if err != nil {
+						return err
+					}
+
+					db.DeleteTodo(uint64(id))
+				}
+
+				return nil
+			},
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {

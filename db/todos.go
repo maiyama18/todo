@@ -6,6 +6,8 @@ import (
 	todo "github.com/ymr-39/todo/lib"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
+	"fmt"
 )
 
 var bucketName = []byte("todos")
@@ -60,6 +62,47 @@ func AllTodos() (todo.Todos, error) {
 	return todos, nil
 }
 
+func DeleteTodo(id uint64) error {
+	return db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(bucketName)
+		return b.Delete(itob(id))
+	})
+}
+
+func ToggleTodo(id uint64, done bool) error {
+	return db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(bucketName)
+		key := itob(id)
+
+		bytes := b.Get(key)
+		todo, err := btot(bytes)
+		if err != nil {
+			return err
+		} else if todo.Done == done {
+			var state string
+			if done {
+				state = "already done"
+			} else {
+				state = "still undone"
+			}
+			return errors.New(fmt.Sprintf("todo #%d is %s", id, state))
+		}
+
+		err = b.Delete(key)
+		if err != nil {
+			return err
+		}
+
+		todo.Done = done
+		bytes, err = ttob(todo)
+		if err != nil {
+			return err
+		}
+
+		return b.Put(key, bytes)
+	})
+}
+
 func btoi(b []byte) uint64 {
 	return binary.BigEndian.Uint64(b)
 }
@@ -69,4 +112,24 @@ func itob(i uint64) []byte {
 	binary.BigEndian.PutUint64(b, i)
 
 	return b
+}
+
+func btot(b []byte) (todo.Todo, error) {
+	var t todo.Todo
+	err := json.Unmarshal(b, &t)
+	if err != nil {
+		return todo.EmptyTodo(), err
+	}
+
+	return t, nil
+}
+
+func ttob(t todo.Todo) ([]byte, error) {
+	var b []byte
+	b, err := json.Marshal(t)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }
