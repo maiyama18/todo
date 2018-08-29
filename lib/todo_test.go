@@ -6,11 +6,10 @@ import (
 )
 
 func TestTodoLine(t *testing.T) {
-	todo := Todo{Title: "test", Done: false}
-	index := 1
+	todo := Todo{Id: 1, Title: "test", Done: false}
 
 	expected := "[ ] #1 test"
-	if actual := todo.TodoLine(index); actual != expected {
+	if actual := todo.TodoLine(); actual != expected {
 		t.Fatal(fmt.Sprintf("expected: %s, actual: %s", expected, actual))
 	}
 }
