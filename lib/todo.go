@@ -10,7 +10,7 @@ type Todo struct {
 
 type Todos []Todo
 
-func (todo Todo) TodoLine(index int) string {
+func (todo Todo) TodoLine() string {
 	var check string
 	if todo.Done {
 		check = "[x]"
@@ -18,5 +18,5 @@ func (todo Todo) TodoLine(index int) string {
 		check = "[ ]"
 	}
 
-	return fmt.Sprintf("%s #%d %s", check, index, todo.Title)
+	return fmt.Sprintf("%s #%d %s", check, todo.Id, todo.Title)
 }

@@ -57,14 +57,14 @@ func main() {
 					return err
 				}
 
-				for i, todo := range todos {
+				for _, todo := range todos {
 					if c.Bool("undone") && todo.Done {
 						continue
 					} else if c.Bool("done") && !todo.Done {
 						continue
 					}
 
-					fmt.Println(todo.TodoLine(i))
+					fmt.Println(todo.TodoLine())
 				}
 
 				return nil
