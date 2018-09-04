@@ -1,6 +1,6 @@
 ## todo
 
-Task management CLI tool based on `urfave/cli` and `https://github.com/boltdb/bolt`.
+Task management CLI tool based on `urfave/cli` and `boltdb/bolt`.
 
 This project is written for my practice of Go programming language, and not intended for actual use. 
 But you can still test this app by `go get github.com/ymr-39/todo`.
